@@ -17,6 +17,24 @@ Hello Everyone! I am Aliya Parvez Shaikh, and I am a data analytics engineering 
 
 Languages: Python, C++, HTML, CSS, R, SQL
 
-Tools: Microsoft Office, AWS (S3, EC2, RDS, Glue DataBrew
+Tools: Microsoft Office, AWS (S3, EC2, RDS, Glue DataBrew)
+
+Environments: VS code, Rstudio
+
+## Radhika Somvanshi
+
+MS - DAEN
+
+rsomvans\@gmu.edu
+
+### About Me
+
+Hello, Myself Radhika Somvanshi. I completed my Bachelor of Engineering in India in Artificial Intelligence and Data Science, Right now i am pursuing my graduate degree in Data Analytics and Engineering at George Mason University. I have chosen this program because i wanted a course where i can work with data in real ways without too much heavy coding or complicated advance mathematics. I like learning by doing and solving practical problems, and this program seems a good fit for that.
+
+During my undergraduate studies, I worked on various mini projects and done my final year project onAI-tailored video recommendations for children. In this project, I applied concepts of machine learning and recommendation systems to design a model that could suggest appropriate videos based on user behavior. I worked with Python, basic NLP, and data preprocessing techniques to clean and prepare the dataset. This experience strengthened my ability to analyze data, apply algorithms, and turn results into meaningful solutions. Also i worked as an Assistant Professor for six month, where I taught computer science concepts. That helped me develop my Communication and critical thinking. Additionally, it deepened my understanding of data structures and algorithms since I had to explain them to students.
+
+### Skill set
+
+Languages: Python, C++, R
 
 Environments: VS code, Rstudio

@@ -102,7 +102,7 @@
     "href": "about_us.html",
     "title": "About Us",
     "section": "",
-    "text": "MS-DAEN\nashaik33@gmu.edu\n\n\nHello Everyone! I am Aliya Parvez Shaikh, and I am a data analytics engineering graduate student at here George Mason University. I have previously completed my bachelors in Computer Science from the German University of Technology in Oman and during my undergraduate degree, I was intrigued with data. The power even a single data point holds, to make or break a pattern. The ability to delve deep into data, discover hidden patterns in a sea of numbers and make discoveries excited me. I have previously worked on creating a study tool to help discover dyslexia among children using machine learning tools. I have also worked on a dataset to understand about the emissions of the petroleum industry in US.\n\n\n\nLanguages: Python, C++, HTML, CSS, R, SQL\nTools: Microsoft Office, AWS (S3, EC2, RDS, Glue DataBrew\nEnvironments: VS code, Rstudio"
+    "text": "MS-DAEN\nashaik33@gmu.edu\n\n\nHello Everyone! I am Aliya Parvez Shaikh, and I am a data analytics engineering graduate student at here George Mason University. I have previously completed my bachelors in Computer Science from the German University of Technology in Oman and during my undergraduate degree, I was intrigued with data. The power even a single data point holds, to make or break a pattern. The ability to delve deep into data, discover hidden patterns in a sea of numbers and make discoveries excited me. I have previously worked on creating a study tool to help discover dyslexia among children using machine learning tools. I have also worked on a dataset to understand about the emissions of the petroleum industry in US.\n\n\n\nLanguages: Python, C++, HTML, CSS, R, SQL\nTools: Microsoft Office, AWS (S3, EC2, RDS, Glue DataBrew)\nEnvironments: VS code, Rstudio"
   },
   {
     "objectID": "about_us.html#quarto",
@@ -186,7 +186,7 @@
     "href": "about_us.html#aliya-parvez-shaikh",
     "title": "About Us",
     "section": "",
-    "text": "MS-DAEN\nashaik33@gmu.edu\n\n\nHello Everyone! I am Aliya Parvez Shaikh, and I am a data analytics engineering graduate student at here George Mason University. I have previously completed my bachelors in Computer Science from the German University of Technology in Oman and during my undergraduate degree, I was intrigued with data. The power even a single data point holds, to make or break a pattern. The ability to delve deep into data, discover hidden patterns in a sea of numbers and make discoveries excited me. I have previously worked on creating a study tool to help discover dyslexia among children using machine learning tools. I have also worked on a dataset to understand about the emissions of the petroleum industry in US.\n\n\n\nLanguages: Python, C++, HTML, CSS, R, SQL\nTools: Microsoft Office, AWS (S3, EC2, RDS, Glue DataBrew\nEnvironments: VS code, Rstudio"
+    "text": "MS-DAEN\nashaik33@gmu.edu\n\n\nHello Everyone! I am Aliya Parvez Shaikh, and I am a data analytics engineering graduate student at here George Mason University. I have previously completed my bachelors in Computer Science from the German University of Technology in Oman and during my undergraduate degree, I was intrigued with data. The power even a single data point holds, to make or break a pattern. The ability to delve deep into data, discover hidden patterns in a sea of numbers and make discoveries excited me. I have previously worked on creating a study tool to help discover dyslexia among children using machine learning tools. I have also worked on a dataset to understand about the emissions of the petroleum industry in US.\n\n\n\nLanguages: Python, C++, HTML, CSS, R, SQL\nTools: Microsoft Office, AWS (S3, EC2, RDS, Glue DataBrew)\nEnvironments: VS code, Rstudio"
   },
   {
     "objectID": "conclusion.html#limitations",
@@ -271,5 +271,19 @@
     "title": "Conclusion",
     "section": "Future Works",
     "text": "Future Works\n\nExpansion of analysis by adding more predictors\nBy utilizing and combining more variables/datasets regarding dietary habits, physical activities, genetics and many more, a stronger analysis can be performed to create a more comprehensive model.\nPerforming cross-validation or training/testing\nUsing validation techniques would provide a more realistic assessment of how effectively the model adjusts to new data and reduce overfitting."
+  },
+  {
+    "objectID": "index.html#section",
+    "href": "index.html#section",
+    "title": "Home",
+    "section": "",
+    "text": "Hello everyone, and welcome to our STAT-515 Final Project website!\nIn this project, we will explore how key health indicators such as BMI, blood pressure, cholesterol and HbA1c levels can relate to diabetes risk and a broader metabolic health in U.S adults using the NHANES 2021–2023 dataset.\n\n\nProject Overview\n\nAnalyze demographic and clinical variables using summary statistics and visualizations  \nUse logistic regression to identify predictors of diabetes  \nClassify individuals into high vs. low metabolic risk groups  \nBuild and evaluate models to understand health patterns  \n\nNavigate through our pages above to view the introduction, research questions, methodology and results, conclusion and our full R code with references."
+  },
+  {
+    "objectID": "about_us.html#radhika-somvanshi",
+    "href": "about_us.html#radhika-somvanshi",
+    "title": "About Us",
+    "section": "Radhika Somvanshi",
+    "text": "Radhika Somvanshi\nMS - DAEN\nrsomvans@gmu.edu\n\nAbout Me\nHello, Myself Radhika Somvanshi. I completed my Bachelor of Engineering in India in Artificial Intelligence and Data Science, Right now i am pursuing my graduate degree in Data Analytics and Engineering at George Mason University. I have chosen this program because i wanted a course where i can work with data in real ways without too much heavy coding or complicated advance mathematics. I like learning by doing and solving practical problems, and this program seems a good fit for that.\nDuring my undergraduate studies, I worked on various mini projects and done my final year project onAI-tailored video recommendations for children. In this project, I applied concepts of machine learning and recommendation systems to design a model that could suggest appropriate videos based on user behavior. I worked with Python, basic NLP, and data preprocessing techniques to clean and prepare the dataset. This experience strengthened my ability to analyze data, apply algorithms, and turn results into meaningful solutions. Also i worked as an Assistant Professor for six month, where I taught computer science concepts. That helped me develop my Communication and critical thinking. Additionally, it deepened my understanding of data structures and algorithms since I had to explain them to students.\n\n\nSkill set\nLanguages: Python, C++, R\nEnvironments: VS code, Rstudio"
   }
 ]

@@ -6,3 +6,19 @@ format: html
 ## Risk in Numbers: A Statistical Analysis of U.S Health Factors using NHANES Data.
 
 ## 
+
+#### Hello everyone, and welcome to our STAT-515 Final Project website! {style="blue"}
+
+In this project, we will explore how key health indicators such as BMI, blood pressure, cholesterol and HbA1c levels can relate to diabetes risk and a broader metabolic health in U.S adults using the NHANES 2021–2023 dataset.
+
+### Project Overview
+
+-   Analyze demographic and clinical variables using summary statistics and visualizations  
+
+-   Use logistic regression to identify predictors of diabetes  
+
+-   Classify individuals into high vs. low metabolic risk groups  
+
+-   Build and evaluate models to understand health patterns  
+
+Navigate through our pages above to view the introduction, research questions, methodology and results, conclusion and our full R code with references.

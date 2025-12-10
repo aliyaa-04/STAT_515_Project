@@ -1,0 +1,8 @@
+---
+title: "Home"
+format: html
+---
+
+## Risk in Numbers: A Statistical Analysis of U.S Health Factors using NHANES Data.
+
+## 

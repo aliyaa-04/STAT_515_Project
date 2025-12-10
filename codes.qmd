@@ -1,0 +1,441 @@
+---
+title: "Codes"
+format: html
+---
+
+### Source Codes
+
+In this page, We will present and explain the codes we used to explore and analyse our project.
+
+#### Initializing and setting up 
+
+1\) We install two packages, "haven" and "dplyr".
+
+```{r}
+#install.packages("haven")
+#install.packages("dplyr")
+
+library(haven) # need to change from .xpt file to csv
+library(dplyr)
+```
+
+2\) Next, we set the base URL
+
+```{r}
+base <- "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/"
+```
+
+3\) Insert our file
+
+```{r}
+read_nhanes <- function(stub) {
+  url_full <- paste0(base, stub, ".xpt")  # note: .xpt is lowercase
+  message("Downloading: ", url_full)
+  read_xpt(url_full)
+}
+```
+
+4\) Read the files from the dataset
+
+```{r}
+demo  <- read_nhanes("DEMO_L") #demographics
+bmx   <- read_nhanes("BMX_L") #body measures
+bpxo  <- read_nhanes("BPXO_L") #blood pressure
+ghb   <- read_nhanes("GHB_L") #hbA1c
+tchol <- read_nhanes("TCHOL_L") #total cholesterol
+diq   <- read_nhanes("DIQ_L") #diabetes questionnaire 
+smq   <- read_nhanes("SMQ_L") #smoking questionnaire 
+
+```
+
+5\) Merge the needed variables across the datasets usings a common identifier "SEQN"
+
+```{r}
+nhanes_all <- demo %>%
+  left_join(bmx, by="SEQN") %>%
+  left_join(bpxo, by="SEQN") %>%
+  left_join(ghb, by="SEQN") %>%
+  left_join(tchol, by="SEQN") %>%
+  left_join(diq, by="SEQN") %>%
+  left_join(smq, by="SEQN")
+```
+
+6\) Keep the data of adults
+
+```{r}
+nhanes_adults <- nhanes_all %>%
+  filter(RIDAGEYR >= 20 | is.na(RIDAGEYR))
+```
+
+7\) Save the new CSV file
+
+```{r}
+write.csv(nhanes_adults,
+          "nhanes_2021_2023_chronic_disease.csv",
+          row.names = FALSE)
+```
+
+#### Set up the new data for exploration and analysis
+
+1\) New dataset with important variables
+
+```{r}
+data <- read.csv("nhanes_2021_2023_chronic_disease.csv")
+str(data)
+```
+
+2\) Install additional libraries for visualization
+
+```{r}
+library(ggplot2)
+#install.packages("corrplot")
+library(corrplot)
+```
+
+3\) Ensure no duplicate rows exist in the dataset
+
+```{r}
+cat("Original rows:", nrow(data), "\n")
+cat("Original columns:", ncol(data), "\n")
+
+nhanes_clean <- data %>%
+  distinct()
+
+cat("Rows after removing duplicate:", nrow(nhanes_clean), "\n")
+#no duplicate rows
+```
+
+4\) Conversion of NHANES codes to numeric
+
+```{r}
+special_codes <- c(
+  7, 8, 9,
+  77, 88, 99,
+  777, 888, 999,
+  7777, 8888, 9999
+)
+missing_codes <- c(
+  "Refused",
+  "Don't know",
+  "Missing",
+  "Blank but applicable",
+  "NA",
+  ""
+)
+nhanes <- nhanes_clean %>%
+  mutate(
+    across(
+      .cols = where(is.numeric),
+      .fns  = ~ ifelse(.x %in% special_codes, NA_real_, .x)
+    ),
+    across(
+      .cols = where(is.character),
+      .fns  = ~ ifelse(.x %in% missing_codes, NA_character_, .x)
+    )
+  )
+
+```
+
+#### Setting up important health variables
+
+1\) Setting up Blood pressure means
+
+```{r}
+nhanes <- nhanes %>%
+  mutate(
+    SBP_mean = rowMeans(select(., BPXOSY1, BPXOSY2, BPXOSY3), na.rm = TRUE),
+    DBP_mean = rowMeans(select(., BPXODI1, BPXODI2, BPXODI3), na.rm = TRUE)
+  )
+```
+
+2\) Diabetes indicators using binary (1 = Yes, 2 = No)
+
+```{r}
+nhanes <- nhanes %>%
+  mutate(
+    diabetes = case_when(
+      DIQ010 == 1 ~ 1,
+      DIQ010 == 2 ~ 0,
+      TRUE        ~ NA_real_
+    )
+  )
+```
+
+3\) Smoking status (ever smoked 100 cigarettes, 1 = YES, 2 = NO)
+
+```{r}
+nhanes <- nhanes %>%
+  mutate(
+    smoker_ever = case_when(
+      SMQ020 == 1 ~ 1,
+      SMQ020 == 2 ~ 0,
+      TRUE        ~ NA_real_
+    )
+  )
+```
+
+4\) Saving the file again (Just in case)
+
+```{r}
+write.csv(nhanes, "nhanes_2021_2023_chronic_disease_clean.csv", row.names = FALSE)
+```
+
+#### Exploratory Analysis
+
+1\) Numerical summary of the dataset
+
+```{r}
+summary_vars <- nhanes %>%
+  select(
+    RIDAGEYR,      # Age
+    BMXBMI,        # BMI
+    BMXWT,         # Weight
+    BMXHT,         # Height
+    BMXWAIST,      # Waist circumference
+    SBP_mean,      # Systolic BP
+    DBP_mean,      # Diastolic BP
+    LBXGH,         # HbA1c
+    LBXTC          # Total Cholesterol
+  )
+
+summary(summary_vars)
+```
+
+2\) Histogram of age distribution
+
+```{r}
+ggplot(nhanes, aes(x = RIDAGEYR)) +
+  geom_histogram(bins = 30, fill = "purple", color = "black") +
+  labs(
+    title = "Distribution of Age (Adults Only)",
+    x = "Age (years)",
+    y = "Count") + theme_minimal()
+```
+
+3\) Histogram of BMI distribution
+
+```{r}
+ggplot(nhanes, aes(x = BMXBMI)) +
+  geom_histogram(bins = 30, fill = "darkred", color = "black") +
+  labs(title = "Distribution of BMI",
+       x = "BMI", y = "Count") + theme_minimal()
+```
+
+4\) Histogram of mean SBP distribution
+
+```{r}
+ggplot(nhanes, aes(x = SBP_mean)) +
+  geom_histogram(bins = 30, fill = "lightyellow", color = "black") +
+  labs(title = "Distribution of Mean Systolic Blood Pressure",
+       x = "Mean SBP (mmHg)", y = "Count") + theme_minimal()
+```
+
+5\) Histogram of mean DBP distribution
+
+```{r}
+ggplot(nhanes, aes(x = DBP_mean)) +
+  geom_histogram(bins = 30, fill = "yellow", color = "black") +
+  labs(title = "Distribution of Mean Diastolic Blood Pressure",
+       x = "Mean DBP (mmHg)", y = "Count") + theme_minimal()
+```
+
+6\) Histogram of total cholestreol distribution
+
+```{r}
+ggplot(nhanes, aes(x = LBXTC)) +
+  geom_histogram(bins = 30, fill = "pink", color = "black") +
+  labs(title = "Distribution of Total Cholesterol",
+       x = "Total Cholesterol", y = "Count") + theme_minimal()
+```
+
+7\) Histogram of HbA1C distribution
+
+```{r}
+ggplot(nhanes, aes(x = LBXGH)) +
+  geom_histogram(bins = 30, fill = "skyblue", color = "black") +
+  labs(title = "Distribution of HbA1c",
+       x = "HbA1c (%)", y = "Count") + theme_minimal()
+```
+
+8\) Correlation Matrix Heatmap
+
+```{r}
+num_vars <- nhanes %>%
+  select(
+    RIDAGEYR,   # Age
+    BMXBMI,     # BMI
+    BMXWAIST,   # Waist circumference
+    SBP_mean,   # Systolic BP
+    DBP_mean,   # Diastolic BP
+    LBXGH,      # HbA1c
+    LBXTC       # Total cholesterol
+  )
+
+corr_matrix <- cor(num_vars, use = "pairwise.complete.obs")
+
+corrplot(corr_matrix,
+         method = "color",
+         type   = "upper",
+         tl.col = "black",
+         tl.cex = 0.9,
+         title  = "Correlation Between Key Health Variables",
+         mar    = c(0,0,2,0))
+```
+
+#### Answering research questions
+
+#### RQ1)
+
+1\) Setting up library
+
+```{r}
+library(tidyr)
+nhanes_rq1 <- nhanes %>%
+  mutate(
+    diabetes = ifelse(DIQ010 == 1, 1, 0)
+  ) %>%
+  drop_na(BMXBMI, diabetes)
+```
+
+2\) Logistic regression model
+
+```{r}
+model_rq1 <- glm(diabetes ~ BMXBMI, data = nhanes_rq1, family = "binomial")
+summary(model_rq1)
+
+prev_bmi <- nhanes_rq1 %>%
+  mutate(bmi_group = cut(
+    BMXBMI,
+    breaks = c(-Inf, 18.5, 25, 30, 35, Inf),
+    labels = c("Underweight", "Normal", "Overweight", "Obese", "Severe Obese")
+  )) %>%
+  group_by(bmi_group) %>%
+  summarize(
+    total = n(),
+    diabetes_cases = sum(diabetes == 1),
+    prevalence = diabetes_cases / total
+  )
+```
+
+3\) Visualization
+
+```{r}
+ggplot(prev_bmi, aes(x = bmi_group, y = prevalence)) +
+  geom_col(fill = "darkblue") +
+  geom_text(aes(label = round(prevalence, 3)), vjust = -0.4) +
+  labs(title = "Diabetes Prevalence by BMI Category",
+       x = "BMI Category",
+       y = "Prevalence of Diabetes") + theme_minimal()
+```
+
+#### RQ 2)
+
+1\) Initial set up
+
+```{r}
+nhanes_rq2 <- nhanes %>%
+  select(
+    SEQN,
+    RIDAGEYR,        # Age
+    RIAGENDR,        # Gender
+    RIDRETH3,        # Race/Ethnicity
+    INDFMPIR,        # Income ratio
+    DMDEDUC2,        # Education
+    BMXBMI,          # BMI
+    BMXWT,           # Weight
+    BMXHT,           # Height
+    BMXWAIST,        # Waist circumference
+    SBP_mean,        # Systolic BP
+    DBP_mean,        # Diastolic BP
+    LBXGH,           # HbA1c
+    LBXTC,           # Total cholesterol
+    diabetes,        # Diabetes (0/1)
+    smoker_ever      # Smoking (0/1)
+  ) %>%
+  drop_na(RIDAGEYR, BMXBMI, LBXGH, LBXTC, SBP_mean, DBP_mean)
+log_r2 <- nhanes_rq2 %>%
+  drop_na(
+    diabetes,
+    BMXBMI, SBP_mean, DBP_mean,
+    LBXGH, LBXTC, smoker_ever
+  )
+```
+
+2\) Regression model
+
+```{r}
+model_rq2 <- glm(
+  diabetes ~ BMXBMI + SBP_mean + DBP_mean + LBXGH + LBXTC + smoker_ever,
+  data = log_r2,
+  family = "binomial"
+)
+summary(model_rq2)
+```
+
+```{r}
+pred_prob <- predict(model_rq2, type = "response")
+pred_class <- ifelse(pred_prob > 0.5, 1, 0)
+
+table(Predicted = pred_class, Actual = log_r2$diabetes)
+```
+
+3\) Tree
+
+```{r}
+library(tree)
+```
+
+```{r}
+tree_rq2 <- tree(factor(diabetes) ~ BMXBMI + SBP_mean + DBP_mean +
+                   LBXGH + LBXTC + smoker_ever,
+                 data = log_r2)
+
+plot(tree_rq2)
+text(tree_rq2, pretty = 0)
+```
+
+#### RQ 3)
+
+```{r}
+nhanes_rq3 <- nhanes %>%
+  mutate(
+    high_risk = ifelse(
+      LBXGH >= 5.7 | BMXBMI >= 30 | SBP_mean >= 130 | LBXTC >= 200,
+      1, 0
+    )
+  ) %>%
+  select(BMXBMI, SBP_mean, DBP_mean, LBXGH, LBXTC, smoker_ever, high_risk) %>%
+  drop_na()
+```
+
+2\) Regression model
+
+```{r}
+model_rq3 <- glm(
+  high_risk ~ BMXBMI + SBP_mean + DBP_mean + LBXGH + LBXTC + smoker_ever,
+  data = nhanes_rq3,
+  family = "binomial"
+)
+
+summary(model_rq3)
+prob3 <- predict(model_rq3, type = "response")
+pred3 <- ifelse(prob3 > 0.5, 1, 0)
+
+table(Predicted = pred3, Actual = nhanes_rq3$high_risk)
+```
+
+3\) Random Forest Model
+
+```{r}
+library(randomForest)
+```
+
+```{r}
+rf_rq3 <- randomForest(
+  factor(high_risk) ~ BMXBMI + SBP_mean + DBP_mean + LBXGH + LBXTC + smoker_ever,
+  data = nhanes_rq3,
+  ntree = 200,
+  mtry = 3
+)
+rf_rq3
+```

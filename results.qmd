@@ -1,0 +1,515 @@
+---
+title: "Methodology and Results"
+format: html
+---
+
+In this page, We shall discuss the methodology used in our project and discuss the findings and results.
+
+## Methodology
+
+#### I. SELECTION OF DATASET
+
+In this project, We first selected our dataset from the 2021-2023 NHANES dataset. We then chose the following variables from the sub-datasets.
+
+1.  ***DEMO_L (demographic dataset)***
+
+    1.  **SEQN** → unique ID;
+
+    2.  **RIDAGEYR** → age in years;
+
+    3.  **RIAGENDR** → sex (1=male, 2=female);
+
+    4.  **RIDRETH3** → race/ethnicity;
+
+    5.  **INDFMPIR** → income-to-poverty ratio;
+
+    6.  **DMDMARTZ** → marital status;
+
+    7.  **DMDEDUC2** → education level;
+
+These are predictors for chronic diseases.
+
+2.  ***BMX_L (BMI/ Body measurements)***
+
+    1.  **BMXWT** → weight
+
+    2.  **BMXHT** → height
+
+    3.  **BMXBMI** → BMI (body mass index)
+
+    4.  **BMXWAIST** → waist circumference
+
+These variables are important as they are major risk factors for diabetes, hypertension, and heart disease.
+
+3.  ***BPXO_L (Blood pressure)***
+
+    1.  **OSBP** → systolic BP
+
+    2.  **ODBP** → diastolic BP
+
+    3.  **OSBPA**, **ODBPA** → averaged readings
+
+These variables are important because blood pressure is a chronic disease indicator and a strong predictor for cardiovascular risk.
+
+4.  ***GHB_L (Glycohemaglobin)***
+
+    1.  **LBXGH** → HbA1c (%)
+
+This variable is used to detect diabetes.
+
+5.  ***TCHOL_L (Total cholesterol)***
+
+    1.  **LBXTC** → total cholesterol (mg/dL)
+
+This variable is a chronic disease predictor
+
+6.  ***DIQ_L (diabetes questionnaire)***
+
+    1.  **DIQ010** → “Doctor diagnosed diabetes?” (1=yes/ 2=no)
+
+    2.  **DIQ160** → “Borderline diabetes?”
+
+    3.  **DIQ050** → taking insulin?
+
+This variable gives the main binary outcome for logistic regression.
+
+7.  ***SMQ_L (smoking questionnaire)***
+
+    1.  **SMQ020** → smoked at least 100 cigarettes
+
+This variable is useful because smoking is a huge risk factor for many diseases and is a strong predictor.
+
+\* We limited our dataset to include only adults (20 years and above) as major health risks are more likely to occur in them and including children could cause biases.
+
+#### II. Setting up dataset in RStudio
+
+After converting the .xpt file to a csv file using the "haven". We cleaned up our data and selected only the important variables which will be used during the project.
+
+```{r}
+#| echo: false
+
+#install.packages("haven")
+#install.packages("dplyr")
+
+library(haven) 
+library(dplyr)
+
+base <- "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/"
+
+read_nhanes <- function(stub) {
+  url_full <- paste0(base, stub, ".xpt")
+  read_xpt(url_full)
+}
+
+demo  <- read_nhanes("DEMO_L")
+bmx   <- read_nhanes("BMX_L")
+bpxo  <- read_nhanes("BPXO_L")
+ghb   <- read_nhanes("GHB_L")
+tchol <- read_nhanes("TCHOL_L")
+diq   <- read_nhanes("DIQ_L")
+smq   <- read_nhanes("SMQ_L")
+
+nhanes_all <- demo %>%
+  left_join(bmx, by="SEQN") %>%
+  left_join(bpxo, by="SEQN") %>%
+  left_join(ghb, by="SEQN") %>%
+  left_join(tchol, by="SEQN") %>%
+  left_join(diq, by="SEQN") %>%
+  left_join(smq, by="SEQN")
+
+nhanes_adults <- nhanes_all %>%
+  filter(RIDAGEYR >= 20 | is.na(RIDAGEYR))
+
+write.csv(nhanes_adults,
+          "nhanes_2021_2023_chronic_disease.csv",
+          row.names = FALSE)
+```
+
+```{r}
+data <- read.csv("nhanes_2021_2023_chronic_disease.csv")
+head(data)
+```
+
+#### III. Setting up libraries for visualization and removing missing values and special codes.
+
+NHANES uses special codes such as "777", "999", or "refused", "NA". and many more. We cleaned the new dataset to ensure there were no missing or invalid values. We also removed any duplicate values
+
+```{r}
+#| echo: false
+library(ggplot2)
+#install.packages("corrplot")
+library(corrplot)
+
+cat("Original rows:", nrow(data), "\n")
+cat("Original columns:", ncol(data), "\n")
+
+#removal of any duplicate rows
+
+nhanes_clean <- data %>%
+  distinct()
+
+cat("Rows after removing duplicate:", nrow(nhanes_clean), "\n")
+#no duplicate rows
+
+# Convert nhanes codes to numeric
+# NHANES often uses these codes for "Refused/Don't know/Missing"
+special_codes <- c(
+  7, 8, 9,
+  77, 88, 99,
+  777, 888, 999,
+  7777, 8888, 9999
+)
+missing_codes <- c(
+  "Refused",
+  "Don't know",
+  "Missing",
+  "Blank but applicable",
+  "NA",
+  ""
+)
+
+nhanes <- nhanes_clean %>%
+  mutate(
+    across(
+      .cols = where(is.numeric),
+      .fns  = ~ ifelse(.x %in% special_codes, NA_real_, .x)
+    ),
+    across(
+      .cols = where(is.character),
+      .fns  = ~ ifelse(.x %in% missing_codes, NA_character_, .x)
+    )
+  )
+```
+
+#### IV. Setting up key health variables
+
+```{r}
+#| echo: false
+#Blood pressure means
+nhanes <- nhanes %>%
+  mutate(
+    SBP_mean = rowMeans(select(., BPXOSY1, BPXOSY2, BPXOSY3), na.rm = TRUE),
+    DBP_mean = rowMeans(select(., BPXODI1, BPXODI2, BPXODI3), na.rm = TRUE)
+  )
+
+#Diabetes indicator (DIQ010: 1 = Yes, 2 = No)
+nhanes <- nhanes %>%
+  mutate(
+    diabetes = case_when(
+      DIQ010 == 1 ~ 1,
+      DIQ010 == 2 ~ 0,
+      TRUE        ~ NA_real_
+    )
+  )
+
+#Smoking status:smoked 100 cigarettes (SMQ020: 1 = Yes, 2 = No)
+nhanes <- nhanes %>%
+  mutate(
+    smoker_ever = case_when(
+      SMQ020 == 1 ~ 1,
+      SMQ020 == 2 ~ 0,
+      TRUE        ~ NA_real_
+    )
+  )
+
+write.csv(nhanes, "nhanes_2021_2023_chronic_disease_clean.csv", row.names = FALSE)
+```
+
+#### V. Conduction Basic Exploratory Analysis
+
+We selected a few variables from the new dataset such as: RIDAGEYR, BMXBMI, BMXWT, BMXHT, BMXWAIST, SBP_mean, DBP_mean, LBXGH, LBXTC.
+
+```{r}
+#| echo: false
+summary_vars <- nhanes %>%
+  select(
+    RIDAGEYR,      # Age
+    BMXBMI,        # BMI
+    BMXWT,         # Weight
+    BMXHT,         # Height
+    BMXWAIST,      # Waist circumference
+    SBP_mean,      # Systolic BP
+    DBP_mean,      # Diastolic BP
+    LBXGH,         # HbA1c
+    LBXTC          # Total Cholesterol
+  )
+
+```
+
+```{r}
+summary(summary_vars)
+```
+
+This statistical summary helps us quickly go through and understand the minimum, maximum and mean values of each variable.
+
+We then created some visualizations to help understand the variables clearly.
+
+1.  Age Distribution Histogram
+
+    ```{r}
+    #| echo: false
+    ggplot(nhanes, aes(x = RIDAGEYR)) +
+      geom_histogram(bins = 30, fill = "steelblue", color = "black") +
+      labs(
+        title = "Distribution of Age (Adults Only)",
+        x = "Age (years)",
+        y = "Count") + theme_minimal()
+    ```
+
+    This histogram helps us visually understand the age range of the individuals in the dataset. As we can see, there are more counts as the age increases.
+
+2.  BMI Distribution Histogram
+
+    ```{r}
+    #| echo: false
+    ggplot(nhanes, aes(x = BMXBMI)) +
+      geom_histogram(bins = 30, fill = "darkred", color = "black") +
+      labs(title = "Distribution of BMI",
+           x = "BMI", y = "Count") + theme_minimal()
+    ```
+
+    This histogram shows that the graph is right-skewed. Most of the adults fall between 20 to 40 range.
+
+3.  Mean SBP histogram
+
+    ```{r}
+    #| echo: false
+    ggplot(nhanes, aes(x = SBP_mean)) +
+      geom_histogram(bins = 30, fill = "lightyellow", color = "black") +
+      labs(title = "Distribution of Mean Systolic Blood Pressure",
+           x = "Mean SBP (mmHg)", y = "Count") + theme_minimal()
+    ```
+
+This histogram shows a roughly normal distribution between 120 mmHg and 150 mmHg
+
+4.  Mean DBP histogram
+
+    ```{r}
+    #| echo: false
+    ggplot(nhanes, aes(x = DBP_mean)) +
+      geom_histogram(bins = 30, fill = "yellow", color = "black") +
+      labs(title = "Distribution of Mean Diastolic Blood Pressure",
+           x = "Mean DBP (mmHg)", y = "Count") + theme_minimal()
+    ```
+
+This histogram shows a distribution of the Diastolic blood pressure between 60 mmHg and 90 mmHg.
+
+5.  Total Cholesterol Distribution
+
+    ```{r}
+    #| echo: false
+    ggplot(nhanes, aes(x = LBXTC)) +
+      geom_histogram(bins = 30, fill = "pink", color = "black") +
+      labs(title = "Distribution of Total Cholesterol",
+           x = "Total Cholesterol", y = "Count") + theme_minimal()
+    ```
+
+    This histogram shows that it peaks around 180-220 mg/dL.
+
+6.  HbA1c Distribution Histogram
+
+    ```{r}
+    #| echo: false
+    ggplot(nhanes, aes(x = LBXGH)) +
+      geom_histogram(bins = 30, fill = "skyblue", color = "black") +
+      labs(title = "Distribution of HbA1c",
+           x = "HbA1c (%)", y = "Count") + theme_minimal()
+    ```
+
+This histogram are heavily concentrated between 5% to 6%.
+
+7.  Correlation Matrix Heatmap
+
+    ```{r}
+    #| echo: false
+    num_vars <- nhanes %>%
+      select(
+        RIDAGEYR,   # Age
+        BMXBMI,     # BMI
+        BMXWAIST,   # Waist circumference
+        SBP_mean,   # Systolic BP
+        DBP_mean,   # Diastolic BP
+        LBXGH,      # HbA1c
+        LBXTC       # Total cholesterol
+      )
+
+    # Correlation matrix (pairwise complete obs ignores NAs)
+    corr_matrix <- cor(num_vars, use = "pairwise.complete.obs")
+    ```
+
+```{r}
+#| echo: false
+# Correlation heatmap
+corrplot(corr_matrix,
+         method = "color",
+         type   = "upper",
+         tl.col = "black",
+         tl.cex = 0.9,
+         title  = "Correlation Between Key Health Variables",
+         mar    = c(0,0,2,0))
+```
+
+The correlation heatmap shows that BMI and waist circumference are strongly correlated, while blood pressure and cholesterol show moderate positive relationships with other metabolic indicators.
+
+#### VI. Answering Research Questions
+
+**(i)** Our first research question explores how BMI influences the risk of diabetes among adults. We first created a binary variable which indicates if a person has diabetes or not (based on the DIQ010 variable), where 1 = Diabetes and 0 = No Diabetes. We also dropped any values which were not available or missing. We then fit a logistic regression model with the diabetes as the response variable and the BMI as the predictor. The aim of this model is to predict if the chances of diabetes increases with BMI.
+
+We also grouped the BMI values into 5 standard categories\[3\], **Underweight** (less than 18.5), **Normal** (between 18.5 and less than 25), **Overweight** (25 to less than 30), **Obese** ( 30 or greater) and **Severe Obese** (40 or greater).
+
+For each BMI group we calculated the percentage of people with diabetes. We used a bar plot to visualize the result.
+
+```{r}
+#| echo: false
+library(tidyr)
+nhanes_rq1 <- nhanes %>%
+  mutate(
+    diabetes = ifelse(DIQ010 == 1, 1, 0)
+  ) %>%
+  drop_na(BMXBMI, diabetes)
+
+# Logistic regression model
+model_rq1 <- glm(diabetes ~ BMXBMI, data = nhanes_rq1, family = "binomial")
+summary(model_rq1)
+
+prev_bmi <- nhanes_rq1 %>%
+  mutate(bmi_group = cut(
+    BMXBMI,
+    breaks = c(-Inf, 18.5, 25, 30, 35, Inf),
+    labels = c("Underweight", "Normal", "Overweight", "Obese", "Severe Obese")
+  )) %>%
+  group_by(bmi_group) %>%
+  summarize(
+    total = n(),
+    diabetes_cases = sum(diabetes == 1),
+    prevalence = diabetes_cases / total
+  )
+
+ggplot(prev_bmi, aes(x = bmi_group, y = prevalence)) +
+  geom_col(fill = "steelblue") +
+  geom_text(aes(label = round(prevalence, 3)), vjust = -0.4) +
+  labs(title = "Diabetes Prevalence by BMI Category",
+       x = "BMI Category",
+       y = "Prevalence of Diabetes") + theme_minimal()
+```
+
+The logistic regression results show that BMI is a statistically significant predictor of diabetes (p \< 2e-16). The positive coefficient (0.058) indicates that as BMI increases, the chances of having diabetes also increase. The barplot also helps us easily visualize the increase in the prevalence of diabetes as the BMI increases, with the normal category having a 0.07% chance of diabetes and the severe obese category having a 0.22% chance of diabetes.
+
+**(ii)** In our second research question, we explore and try to answer if we can predict diabetes using health risk factors such as BMI, HbA1c, blood pressure, cholesterol, and smoking status.
+
+We selected another subset of variables to fit a logistic regression model. We then generated predicted probabilities and classified individuals as diabetic or non-diabetic, which allowed us to compare predicted versus actual outcomes through a confusion matrix. This model lets us to assess how each risk factor influences the likelihood of developing diabetes while accounting for the others.
+
+We then created a classification tree with the same predictors to see how the variables split the data and which factors were most relevant for prediction. This tree is a simple graphical representation of the decision criteria that distinguish diabetics from non-diabetics. Together, these steps allows us to evaluate both statistical significance and prediction accuracy for diabetes risk.
+
+```{r}
+#| echo: false
+nhanes_rq2 <- nhanes %>%
+  select(
+    SEQN,
+    RIDAGEYR,        # Age
+    RIAGENDR,        # Gender
+    RIDRETH3,        # Race/Ethnicity
+    INDFMPIR,        # Income ratio
+    DMDEDUC2,        # Education
+    BMXBMI,          # BMI
+    BMXWT,           # Weight
+    BMXHT,           # Height
+    BMXWAIST,        # Waist circumference
+    SBP_mean,        # Systolic BP
+    DBP_mean,        # Diastolic BP
+    LBXGH,           # HbA1c
+    LBXTC,           # Total cholesterol
+    diabetes,        # Diabetes (0/1)
+    smoker_ever      # Smoking (0/1)
+  ) %>%
+  drop_na(RIDAGEYR, BMXBMI, LBXGH, LBXTC, SBP_mean, DBP_mean)
+log_r2 <- nhanes_rq2 %>%
+  drop_na(
+    diabetes,
+    BMXBMI, SBP_mean, DBP_mean,
+    LBXGH, LBXTC, smoker_ever
+  )
+
+model_rq2 <- glm(
+  diabetes ~ BMXBMI + SBP_mean + DBP_mean + LBXGH + LBXTC + smoker_ever,
+  data = log_r2,
+  family = "binomial"
+)
+summary(model_rq2)
+
+pred_prob <- predict(model_rq2, type = "response")
+pred_class <- ifelse(pred_prob > 0.5, 1, 0)
+
+table(Predicted = pred_class, Actual = log_r2$diabetes)
+
+library(tree)
+
+tree_rq2 <- tree(factor(diabetes) ~ BMXBMI + SBP_mean + DBP_mean +
+                   LBXGH + LBXTC + smoker_ever,
+                 data = log_r2)
+
+plot(tree_rq2)
+text(tree_rq2, pretty = 0)
+```
+
+The logistic regression results demonstrate that HbA1c (LBXGH) is the most powerful predictor of diabetes, with a large and highly significant coefficient (2.1755). BMI, systolic blood pressure, and cholesterol are all significant predictors of diabetes, but smoking status is not. The confusion matrix demonstrates that the model performs well overall: it properly categorised 4,247 non-diabetic individuals and 412 diabetic individuals, with just 271 false negatives and 56 false positives. With an accuracy of 93%. This suggests that the model can reasonably differentiate between diabetic and non-diabetic patients.
+
+The tree also demonstrates that HbA1c is the main variable which splits the individuals into diabetic or non diabetic groups. If the A1c (blood glucose/sugar) value is less than 5.7, it is normal, but if it is greater than 6.5, the person is diabetic \[4\].
+
+**(iii)** In our third and final research question, we try to find if we can properly classify individuals into high vs low metabolic risk groups. To answer this question we created a new variable "high_risk". Indivizuals were going to be labeled high risk if they met the clinical points. That is, if their :
+
+-   AC1 levels (blood glucose levels, LBXGH) were 5.7 or higher \[4\];
+
+-   BMI levels (BMXMBI levels) were 30 or higher \[3\];
+
+-   Systolic blood pressure (SBP_mean) were 130 or higher \[5\];
+
+-   Total Cholesterol levels ( LBXTC) were 200 or higher \[6\].
+
+    We then chose the relevant predictors and used a logistic regression model to determine what factors predicted a high metabolic risk strongly. We also built a confusion matrix to assess how effectively the model predicted high- and low-risk individuals. Finally, we trained a random forest model to compare results and see whether a more flexible model increases prediction accuracy.
+
+```{r}
+#| echo: false
+nhanes_rq3 <- nhanes %>%
+  mutate(
+    high_risk = ifelse(
+      LBXGH >= 5.7 | BMXBMI >= 30 | SBP_mean >= 130 | LBXTC >= 200,
+      1, 0
+    )
+  ) %>%
+  select(BMXBMI, SBP_mean, DBP_mean, LBXGH, LBXTC, smoker_ever, high_risk) %>%
+  drop_na()
+
+model_rq3 <- glm(
+  high_risk ~ BMXBMI + SBP_mean + DBP_mean + LBXGH + LBXTC + smoker_ever,
+  data = nhanes_rq3,
+  family = "binomial"
+)
+
+summary(model_rq3)
+prob3 <- predict(model_rq3, type = "response")
+pred3 <- ifelse(prob3 > 0.5, 1, 0)
+
+table(Predicted = pred3, Actual = nhanes_rq3$high_risk)
+
+library(randomForest)
+
+rf_rq3 <- randomForest(
+  factor(high_risk) ~ BMXBMI + SBP_mean + DBP_mean + LBXGH + LBXTC + smoker_ever,
+  data = nhanes_rq3,
+  ntree = 200,
+  mtry = 3
+)
+
+rf_rq3
+```
+
+The logistic regression results indicates that all clinical factors are strong predictors of metabolic risk, particularly HbA1c, cholesterol, BMI and systolic blood pressure. All predictors had significant p-values(p\<0.001), suggesting they do help identify individuals at high metabolic risk.
+
+The confusion matrix also shows that the logistic model performs effectively, correctly identifying 696 low-risk and 3991 high-risk people, with only small misclassification in the low-risk group. This indicates that the model is very good at detecting high-risk individuals but less accurate for low-risk ones. The random forest model also performs extraordinarily well, with an error rate of 0%, indicating that it correctly identified all individuals in this sample.
+
+## Results
+
+After answering all the three research questions, our analysis showed that health factors such as BMI, HbA1c, blood pressure and cholesterol levels are very strong predictors of diabetes and overall metabolic risk. We were able to prove that BMI played a role in the prevalence of diabetes. Using a multivariable logistic model for diabetes prediction helps us analyse that HbA1c is the most influential predictor. The model not only performed well but also had an accuracy of 93%. The high and low risk classification model also showed a great performance as it achieved perfect accuracy.
+
+*NOTE: The random forest model has a 0% error rate since the high-risk variable was created with the same variables as the model (HbA1c, BMI, blood pressure, and cholesterol). Because these clinical cutoffs establish risk status, the random forest could exactly reproduce this rule. This outcome shows overfitting, rather than real prediction performance on unknown data.*

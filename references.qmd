@@ -1,0 +1,20 @@
+---
+title: "References"
+format: html
+---
+
+## References
+
+In this page, We list our references and citations in IEEE style.
+
+1\) “Lifestyle risk factors,” Environmental Public Health Tracking, Dec. 22, 2023. Available: <https://www.cdc.gov/environmental-health-tracking/php/data-research/lifestyle-risk-factors.html>
+
+2)Centers for Disease Control and Prevention, “Lifestyle Risk Factors,” *CDC Environmental Public Health Tracking*, 2024. \[Online\]. Available: <https://www.cdc.gov/environmental-health-tracking/php/data-research/lifestyle-risk-factors.html>.
+
+3\) Centers for Disease Control and Prevention, “Adult BMI Categories,” CDC.gov. \[Online\]. Available: <https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html.>
+
+4\) American Diabetes Association, “Diabetes Diagnosis,” Diabetes.org. \[Online\]. Available: <https://diabetes.org/about-diabetes/diagnosis.>
+
+5\) American Heart Association, “What Is High Blood Pressure?” Answers by Heart, pp. 1–2. \[Online\]. Available: <https://www.heart.org/-/media/files/health-topics/answers-by-heart/what-is-high-blood-pressure.pdf.>
+
+6\) Mayo Clinic, “Cholesterol Test,” MayoClinic.org. \[Online\]. Available: <https://www.mayoclinic.org/tests-procedures/cholesterol-test/about/pac-20384601.>

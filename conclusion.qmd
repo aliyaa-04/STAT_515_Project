@@ -1,0 +1,30 @@
+---
+title: "Conclusion"
+format: html
+---
+
+In this page, We shall discuss the conclusions, limitations and future works and conclude our project.
+
+## Conclusion
+
+This project demonstrates that publicly accessible clinical data, such as BMI, blood pressure, cholesterol and HbA1c, can accurately predict diabetes and classify individuals into metabolic risk groups. Our findings support well-established medical relationships: obesity and high blood sugar levels significantly raise diabetes risk, and combining these factors provides a stronger value in predicting. The robust model performance indicates that statistical tools can aid in early identification and public health decision-making. Overall, the NHANES dataset provides useful insights into population-level health trends and the factors that most influence chronic illness risk.
+
+## Limitations
+
+1.  **Limited time range.**
+
+    The dataset we explored and analysed was only from August 2021 to August 2023, so we were unable to examine or analyse at long term trends or changes.
+
+2.  **Random forest was not validated.**
+
+    Because the model was trained and evaluated on the same data, the accuracy rate was likely inflated, as shown by the 0% error, which does not reflect real-world performance.
+
+## Future Works
+
+1.  **Expansion of analysis by adding more predictors**
+
+    By utilizing and combining more variables/datasets regarding dietary habits, physical activities, genetics and many more, a stronger analysis can be performed to create a more comprehensive model.
+
+2.  **Performing cross-validation or training/testing**
+
+    Using validation techniques would provide a more realistic assessment of how effectively the model adjusts to new data and reduce overfitting.

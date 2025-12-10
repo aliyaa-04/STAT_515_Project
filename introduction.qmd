@@ -1,0 +1,40 @@
+---
+title: "Introduction"
+format: html
+---
+
+# Introduction
+
+Chronic diseases such as cardiovascular diseases, cancer, diabetes are one of the leading reasons for death in the United States of America. To examine the cause of these diseases, it is important to analyse if lifestyle factors play a role in it. Factors such as improper diet, lack of physical activity, alcohol and tobacco usage, lack of sleep are important factors \[1\].
+
+For this project, we chose the NHANES (National Health and Nutrition Examination Survey) dataset, which is publicly available from the NHANES website \[2\]. The dataset is a national survey which is conducted by the CDC (Centers for Disease Control and Prevention). The dataset contains multiple datasets regarding the demographics, dietary, examination, laboratory, questionnaire and limited access data. The objective of this dataset is to:
+
+1.  Estimate the number and percentage of individuals in the U.S population with selected diseases and risk factors;
+
+2.  Monitor all trends in its prevalenceand awareness of selected diseases;
+
+3.  Study the relationship between diet, nutrition, and health
+
+Understanding how certain demographic and lifestyle factors affect health outcomes is essential for improving public health strategies. With a rising rate in obesity, diabetes, and cardiovascular disease in the U.S, it has become essential to investigate:
+
+1.  Which variables are most strongly associated with health risks;
+
+2.  Whether certain groups are more vulnerable than other groups;
+
+3.  How statistical models can help predict health outcomes;
+
+By analyzing these patterns and trends, we aim to contribute to a deeper understanding of population level health trends \[2\].
+
+## Project Aim
+
+Through this project, we aim to:
+
+1.  Explore relationships between demographic factors and health indicators;
+
+2.  Build and interpret statistical models such as logistic regression and trees;
+
+3.  Visualize trends and patterns using effective data graphics;
+
+4.  Answer our research questions based on evidence from the NHANES dataset and present them.
+
+Ultimately, our goal is to combine data analytics and statistical reasoning to better understand factors that influence health in the U.S. population.

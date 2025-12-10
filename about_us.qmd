@@ -1,0 +1,22 @@
+---
+title: "About Us"
+format: html
+---
+
+## Aliya Parvez Shaikh
+
+MS-DAEN
+
+ashaik33\@gmu.edu
+
+### About Me
+
+Hello Everyone! I am Aliya Parvez Shaikh, and I am a data analytics engineering graduate student at here George Mason University. I have previously completed my bachelors in Computer Science from the German University of Technology in Oman and during my undergraduate degree, I was intrigued with data. The power even a single data point holds, to make or break a pattern. The ability to delve deep into data, discover hidden patterns in a sea of numbers and make discoveries excited me. I have previously worked on creating a study tool to help discover dyslexia among children using machine learning tools. I have also worked on a dataset to understand about the emissions of the petroleum industry in US.
+
+### Skill set
+
+Languages: Python, C++, HTML, CSS, R, SQL
+
+Tools: Microsoft Office, AWS (S3, EC2, RDS, Glue DataBrew
+
+Environments: VS code, Rstudio

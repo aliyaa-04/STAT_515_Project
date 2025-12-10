@@ -1,0 +1,30 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "STAT515 Project"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: about_us.qmd
+        text: About Us
+      - href: introduction.qmd
+        text: Introduction
+      - href: research_questions.qmd
+        text: Research Questions
+      - href: results.qmd
+        text: Results
+      - href: conclusion.qmd
+        text: Conclusion
+      - href: codes.qmd
+        text: Codes
+      - href: references.qmd
+        text: References
+
+format:
+  html:
+    theme: sandstone
+    toc: true
+        

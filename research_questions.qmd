@@ -1,0 +1,51 @@
+---
+title: "Research Questions"
+format: html
+---
+
+In this page, We shall discuss our research questions for this project and why they are important.
+
+In this project, We investigate health risk factors using health variables from the 2021-2023 NHANES dataset, including BMI, blood pressure, HbA1C, cholesterol, smoking status, and demographic factors such as race and gender. The aim of this project is to explore predictors of these diseases and examine health disparities among population subgroups. This project aims to address the following research questions:
+
+## Research Question 1
+
+### How does BMI influence the risk of diabetes among adults?
+
+#### Reason
+
+BMI (Body Mass Index) is one of the most widely used indicators of health risk. Multiple studies have shown that being overweight or obese is highly connected with type 2 diabetes. But the intensity of this connection varies per population. Therefore, by understanding how BMI influences diabetes risk in the NHANES dataset might help identify groups or individuals that would benefit the most from early intervention and lifestyle changes.
+
+#### Why is this question beneficial?
+
+Quantifying the connection between BMI and Diabetes might help doctors or medical researchers identify people at high risk. It could also lead to awareness and creating health programs which emphasis weight management and a healthier lifestyle.
+
+## Research Question 2
+
+### Can we predict diabetes using BMI, HbA1c, blood pressure, cholesterol, and smoking status?
+
+#### Reason {style="color: darkblue"}
+
+Diabetes is a chronic condition which usually develops quietly. Predictive algorithms based on common clinical parameters (HbA1c, BP, cholesterol) can detect danger sooner and direct treatment decisions. Using numerous health indicators, rather than just one, parallels real-world clinical assessments.
+
+#### Why is this question benficial?
+
+Addressing this research question is important as it helps determine which indicators are the best predictors of diabetes.
+
+It supports the development of screening technologies to detect diabetes risk at an earlier stage.\
+It also enables healthcare systems to deploy resources more efficiently.\
+It demonstrates the importance of statistical modelling in real-world health prediction.\
+This research question also determines if the model performs well enough to be utilized in practical situations.
+
+## Research Question 3
+
+### How well can we classify individuals into high vs low metabolic risk groups?
+
+#### Reason {style="color: darkblue"}
+
+Obesity, high blood pressure, abnormal cholesterol levels, and higher blood glucose levels all contribute to metabolic risk. Individuals are classified based on these risk indicators, allowing researchers to evaluate the overall metabolic health rather than focusesing on a single condition.
+
+#### Why is this question beneficial?
+
+Answering this research question not only helps in understanding the health of the population but also helps in identifying individuals at risk of developing chronic diseases.\
+It also allows for the creation of simple classification tools and techniques that could enhance public health policies.\
+Creation of simple but accurate classification models are critical for preventive medicine, early detection, and personalised healthcare planning.
